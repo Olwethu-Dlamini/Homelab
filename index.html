@@ -3,153 +3,125 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Homelab — From an Old PC to Your Own Server</title>
-<meta name="description" content="A hands-on homelab teaching site: turn an old PC into your own server. Hypervisors, VMs, Docker, networking, and hardening — explained from first principles.">
+<title>homelab -- old PC to your own server</title>
+<meta name="description" content="A build-it-yourself homelab: turn an old PC into your own server. Hypervisors, VMs, Docker, networking, hardening.">
 <style>
   :root{
-    --bg:#0f1419; --bg2:#161c24; --bg3:#1d242e; --panel:#141a21;
-    --text:#d7dee6; --muted:#9aa7b4; --line:#2a333f;
-    --accent:#5db0ff; --accent2:#7ee787; --warn:#ffb454; --sec:#bc8cff;
-    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+    --bg:#080d09; --win:#0c120d; --line:#16241a;
+    --fg:#8fdfa4; --bright:#c9ffd9; --accent:#39ff88; --dim:#4c6b58;
+    --mono:"SFMono-Regular",ui-monospace,Menlo,Monaco,Consolas,"DejaVu Sans Mono","Liberation Mono",monospace;
   }
   *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.65;font-size:16px}
-  a{color:var(--accent);text-decoration:none}
-  a:hover{text-decoration:underline}
-  .wrap{max-width:1000px;margin:0 auto;padding:0 24px}
+  html,body{margin:0}
+  body{
+    background:var(--bg); color:var(--fg);
+    font-family:var(--mono); font-size:15px; line-height:1.6;
+    padding:24px 16px 80px;
+    -webkit-font-smoothing:none;
+  }
+  /* faint CRT scanlines + vignette, purely cosmetic */
+  body::before{
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:9;
+    background:repeating-linear-gradient(transparent 0 2px, rgba(0,0,0,.16) 2px 4px);
+  }
+  body::after{
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:9;
+    background:radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(0,0,0,.55) 100%);
+  }
 
-  /* Hero */
-  header.hero{padding:96px 0 56px;text-align:center;border-bottom:1px solid var(--line)}
-  header.hero .kicker{font-family:var(--mono);font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--sec);margin-bottom:18px}
-  header.hero h1{font-size:clamp(34px,6vw,58px);line-height:1.08;margin:0 0 18px;
-    background:linear-gradient(90deg,#5db0ff,#7ee787);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-  header.hero p.lead{font-size:clamp(17px,2.4vw,21px);color:var(--muted);max-width:640px;margin:0 auto 32px}
-  .btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
-  .btn{display:inline-block;padding:13px 26px;border-radius:10px;font-weight:600;font-size:15px;border:1px solid var(--line)}
-  .btn.primary{background:linear-gradient(90deg,#5db0ff,#7ee787);color:#08111b;border:none}
-  .btn.primary:hover{text-decoration:none;filter:brightness(1.07)}
-  .btn.ghost{background:var(--bg2);color:var(--text)}
-  .btn.ghost:hover{text-decoration:none;border-color:var(--accent);color:#fff}
+  .term{max-width:860px; margin:0 auto; background:var(--win);
+    border:1px solid var(--line); border-radius:7px; overflow:hidden;
+    box-shadow:0 0 0 1px #000, 0 24px 70px -30px rgba(57,255,136,.25);}
+  .bar{display:flex; align-items:center; gap:8px; padding:9px 12px;
+    background:#0a100b; border-bottom:1px solid var(--line); color:var(--dim); font-size:12.5px;}
+  .bar .dot{width:11px; height:11px; border-radius:50%; display:inline-block}
+  .bar .r{background:#3a1f1f} .bar .y{background:#3a331f} .bar .g{background:#1f3a25}
+  .bar .title{margin-left:8px}
+  .bar .spec{margin-left:auto; letter-spacing:.02em}
 
-  /* Sections */
-  section{padding:56px 0}
-  h2{font-size:28px;margin:0 0 8px}
-  h2 .dot{color:var(--accent)}
-  .section-sub{color:var(--muted);margin:0 0 32px;max-width:680px}
+  .screen{padding:22px 22px 30px}
+  pre{margin:0; white-space:pre; font:inherit}
+  .scroll{overflow-x:auto}                 /* banner never breaks the layout */
+  .banner{color:var(--accent); text-shadow:0 0 6px rgba(57,255,136,.45); margin:2px 0 2px; font-size:13px; line-height:1.15}
 
-  /* Journey */
-  .journey{display:grid;gap:14px}
-  .step{display:flex;gap:18px;align-items:flex-start;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
-  .step .n{flex:0 0 40px;height:40px;width:40px;border-radius:10px;display:grid;place-items:center;
-    font-family:var(--mono);font-weight:700;color:#08111b;background:linear-gradient(135deg,#5db0ff,#7ee787)}
-  .step h3{margin:2px 0 4px;font-size:18px;color:#eef3f8}
-  .step p{margin:0;color:var(--muted);font-size:15px}
+  .prompt{color:var(--dim); margin:26px 0 2px}
+  .prompt .u{color:var(--accent)} .prompt .p{color:var(--bright)} .prompt .c{color:var(--fg)}
+  .comment{color:var(--dim)}
+  .out{margin:6px 0 2px}
+  strong,b{color:var(--bright); font-weight:600}
+  a{color:var(--accent); text-decoration:none}
+  a:hover{background:var(--accent); color:#03150a}
+  hr{border:0; border-top:1px dashed var(--line); margin:22px 0}
 
-  /* Cards */
-  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-  .card{display:block;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:22px 22px 20px;transition:border-color .15s,transform .15s}
-  .card:hover{text-decoration:none;border-color:var(--accent);transform:translateY(-2px)}
-  .card .tag{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--sec)}
-  .card.guide .tag{color:var(--accent2)}
-  .card h3{margin:8px 0 6px;font-size:18px;color:#eef3f8}
-  .card p{margin:0;color:var(--muted);font-size:14px}
-  .card .go{display:inline-block;margin-top:14px;font-size:13px;color:var(--accent);font-weight:600}
+  /* roadmap + file rows share a dotted-leader layout */
+  .row{display:flex; align-items:baseline; gap:0; padding:3px 0; white-space:nowrap}
+  .row .k{color:var(--bright)}
+  .row .lead{flex:1 1 auto; align-self:stretch; margin:0 8px;
+    border-bottom:1px dotted var(--line); transform:translateY(-4px)}
+  .row .v{color:var(--dim); flex:0 0 auto; white-space:normal}
+  .row.file .k{color:var(--fg)}
+  .row .n{color:var(--dim); margin-right:14px}   /* index number / perms */
+  .open{color:var(--accent)}
+  .row a.k:hover{background:var(--accent); color:#03150a}
+  .desc{color:var(--dim); margin:1px 0 10px 0; white-space:normal}
 
-  footer{border-top:1px solid var(--line);padding:36px 0 60px;color:var(--muted);font-size:14px;text-align:center}
-  footer a{color:var(--muted)}
-  footer a:hover{color:var(--text)}
+  .cursor{display:inline-block; width:9px; height:1.05em; background:var(--accent);
+    transform:translateY(2px); animation:blink 1.05s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+
+  @media (max-width:560px){
+    body{font-size:13px}
+    .row{white-space:normal}
+    .row .lead{display:none}
+    .row .v{flex-basis:100%}
+  }
 </style>
 </head>
 <body>
-
-<header class="hero">
-  <div class="wrap">
-    <div class="kicker">Homelab · a build-it-yourself course</div>
-    <h1>From an old PC to your own server</h1>
-    <p class="lead">Turn a spare machine into a real home server — your own private cloud. Learn the concepts from first principles, then build the whole stack step by step.</p>
-    <div class="btns">
-      <a class="btn primary" href="home-server-guide-v2.html">Start the full guide →</a>
-      <a class="btn ghost" href="#docs">Browse the docs</a>
-    </div>
+<div class="term">
+  <div class="bar">
+    <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+    <span class="title">oll@homelab: ~/homelab</span>
+    <span class="spec">80x24</span>
   </div>
-</header>
 
-<main class="wrap">
+  <div class="screen">
+<div class="comment">Last login: the day you decided to stop paying for a VPS.</div>
 
-  <section id="journey">
-    <h2>The journey<span class="dot">.</span></h2>
-    <p class="section-sub">Five stages, bottom to top. Each one is a section of the guide — and the concepts behind them live in the docs below.</p>
-    <div class="journey">
-      <div class="step"><div class="n">1</div><div>
-        <h3>Foundations</h3>
-        <p>The networking you must own: private vs public IPs, NAT, CGNAT, ports, DNS, and whether your connection can even host a server.</p>
-      </div></div>
-      <div class="step"><div class="n">2</div><div>
-        <h3>The hypervisor</h3>
-        <p>What virtualization actually is and how it works — then install Proxmox as the bare-metal base and run your OS as a VM inside it.</p>
-      </div></div>
-      <div class="step"><div class="n">3</div><div>
-        <h3>Build the base</h3>
-        <p>A Linux VM, SSH, a fixed internal IP, the daily commands, and Docker + Compose as the way you run everything.</p>
-      </div></div>
-      <div class="step"><div class="n">4</div><div>
-        <h3>Deploy your apps</h3>
-        <p>A reverse proxy, your domain on Cloudflare, DNS records, and getting to the internet safely — Cloudflare Tunnel or port forwarding.</p>
-      </div></div>
-      <div class="step"><div class="n">5</div><div>
-        <h3>Run it like a pro</h3>
-        <p>SSH keys, a firewall, fail2ban, backups and snapshots, and the maintenance habits that keep it alive and secure.</p>
-      </div></div>
-    </div>
-  </section>
+<div class="prompt"><span class="u">oll@homelab</span>:<span class="p">~/homelab</span>$ <span class="c">cat welcome</span></div>
+<div class="scroll"><pre class="banner"> _   _     ___     __  __    _____    _           _       ____
+| | | |   / _ \   |  \/  |  | ____|  | |         / \     | __ )
+| |_| |  | | | |  | |\/| |  |  _|    | |        / _ \    |  _ \
+|  _  |  | |_| |  | |  | |  | |___   | |___    / ___ \   | |_) |
+|_| |_|   \___/   |_|  |_|  |_____|  |_____|  /_/   \_\  |____/ </pre></div>
+<div class="out">  an old PC  ──▶  your own server.  no cloud bill, no gatekeepers.</div>
+<div class="out comment">  # a build-it-yourself course. read top of the file for the fast path:</div>
+<div class="out">  <a href="home-server-guide-v2.html">./the-home-server-guide</a>  <span class="comment"># the whole thing, one page, start to finish</span></div>
 
-  <section id="docs">
-    <h2>The material<span class="dot">.</span></h2>
-    <p class="section-sub">The complete hands-on guide, plus deep-dive docs on virtualization from first principles.</p>
-    <div class="cards">
-      <a class="card guide" href="home-server-guide-v2.html">
-        <div class="tag">Complete guide</div>
-        <h3>The Home Server Guide</h3>
-        <p>The full walkthrough, start to finish — foundations, hypervisor, build, deploy, and hardening in one page.</p>
-        <span class="go">Read the guide →</span>
-      </a>
-      <a class="card" href="https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/hypervisors/01-what-is-a-hypervisor.md">
-        <div class="tag">Hypervisors · 01</div>
-        <h3>What is a hypervisor?</h3>
-        <p>Type 1 vs Type 2, why you'd virtualize, and how VMs differ from containers.</p>
-        <span class="go">Read doc →</span>
-      </a>
-      <a class="card" href="https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/hypervisors/02-how-virtualization-works.md">
-        <div class="tag">Hypervisors · 02</div>
-        <h3>How virtualization works</h3>
-        <p>VT-x/AMD-V, KVM, memory translation, virtio, and IOMMU/PCIe passthrough.</p>
-        <span class="go">Read doc →</span>
-      </a>
-      <a class="card" href="https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/hypervisors/03-choosing-a-platform.md">
-        <div class="tag">Hypervisors · 03</div>
-        <h3>Choosing a platform</h3>
-        <p>Proxmox vs ESXi vs XCP-ng vs KVM/libvirt — trade-offs and a decision guide.</p>
-        <span class="go">Read doc →</span>
-      </a>
-      <a class="card" href="https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/hypervisors/04-proxmox-in-practice.md">
-        <div class="tag">Hypervisors · 04</div>
-        <h3>Proxmox in practice</h3>
-        <p>VMs vs LXC, storage, networking, and snapshots vs backups on a real node.</p>
-        <span class="go">Read doc →</span>
-      </a>
-    </div>
-  </section>
+<div class="prompt"><span class="u">oll@homelab</span>:<span class="p">~/homelab</span>$ <span class="c">cat roadmap</span></div>
+<div class="out comment"># the build, bottom of the stack to the top:</div>
+<div class="row"><span class="n">[1]</span><span class="k">foundations</span><span class="lead"></span><span class="v">IPs, NAT, CGNAT, ports, DNS</span></div>
+<div class="row"><span class="n">[2]</span><span class="k">the hypervisor</span><span class="lead"></span><span class="v">virtualization + Proxmox as the base</span></div>
+<div class="row"><span class="n">[3]</span><span class="k">build the base</span><span class="lead"></span><span class="v">Linux VM, SSH, Docker + Compose</span></div>
+<div class="row"><span class="n">[4]</span><span class="k">deploy your apps</span><span class="lead"></span><span class="v">reverse proxy, domain, DNS, tunnels</span></div>
+<div class="row"><span class="n">[5]</span><span class="k">run it like a pro</span><span class="lead"></span><span class="v">SSH keys, firewall, backups, habits</span></div>
 
-</main>
+<div class="prompt"><span class="u">oll@homelab</span>:<span class="p">~/homelab</span>$ <span class="c">ls docs/hypervisors/</span></div>
+<div class="out comment"># virtualization from first principles. read in order:</div>
+<div class="row file"><span class="n">01</span><a class="k" href="https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/hypervisors/01-what-is-a-hypervisor.md">what-is-a-hypervisor.md</a><span class="lead"></span><span class="v">[<span class="open">open</span>]</span></div>
+<div class="desc">   type 1 vs type 2, why virtualize, VMs vs containers</div>
+<div class="row file"><span class="n">02</span><a class="k" href="https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/hypervisors/02-how-virtualization-works.md">how-virtualization-works.md</a><span class="lead"></span><span class="v">[<span class="open">open</span>]</span></div>
+<div class="desc">   VT-x/AMD-V, KVM, memory translation, virtio, IOMMU/passthrough</div>
+<div class="row file"><span class="n">03</span><a class="k" href="https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/hypervisors/03-choosing-a-platform.md">choosing-a-platform.md</a><span class="lead"></span><span class="v">[<span class="open">open</span>]</span></div>
+<div class="desc">   Proxmox vs ESXi vs XCP-ng vs KVM/libvirt, with a decision guide</div>
+<div class="row file"><span class="n">04</span><a class="k" href="https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/hypervisors/04-proxmox-in-practice.md">proxmox-in-practice.md</a><span class="lead"></span><span class="v">[<span class="open">open</span>]</span></div>
+<div class="desc">   VMs vs LXC, storage, networking, snapshots vs backups</div>
 
-<footer>
-  <div class="wrap">
-    Built in the open · <a href="https://github.com/Olwethu-Dlamini/Homelab">github.com/Olwethu-Dlamini/Homelab</a><br>
-    Released into the public domain.
+<hr>
+<div class="prompt"><span class="u">oll@homelab</span>:<span class="p">~/homelab</span>$ <span class="c">./the-home-server-guide</span></div>
+<div class="out">  starting the guide <span class="comment">// public domain · source: <a href="https://github.com/Olwethu-Dlamini/Homelab">github.com/Olwethu-Dlamini/Homelab</a></span></div>
+<div class="prompt"><span class="u">oll@homelab</span>:<span class="p">~/homelab</span>$ <span class="cursor"></span></div>
   </div>
-</footer>
-
+</div>
 </body>
 </html>
