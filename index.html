@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Homelab — From an Old PC to Your Own Server</title>
+<meta name="description" content="A hands-on homelab teaching site: turn an old PC into your own server. Hypervisors, VMs, Docker, networking, and hardening — explained from first principles.">
+<style>
+  :root{
+    --bg:#0f1419; --bg2:#161c24; --bg3:#1d242e; --panel:#141a21;
+    --text:#d7dee6; --muted:#9aa7b4; --line:#2a333f;
+    --accent:#5db0ff; --accent2:#7ee787; --warn:#ffb454; --sec:#bc8cff;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.65;font-size:16px}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 24px}
+
+  /* Hero */
+  header.hero{padding:96px 0 56px;text-align:center;border-bottom:1px solid var(--line)}
+  header.hero .kicker{font-family:var(--mono);font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--sec);margin-bottom:18px}
+  header.hero h1{font-size:clamp(34px,6vw,58px);line-height:1.08;margin:0 0 18px;
+    background:linear-gradient(90deg,#5db0ff,#7ee787);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  header.hero p.lead{font-size:clamp(17px,2.4vw,21px);color:var(--muted);max-width:640px;margin:0 auto 32px}
+  .btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .btn{display:inline-block;padding:13px 26px;border-radius:10px;font-weight:600;font-size:15px;border:1px solid var(--line)}
+  .btn.primary{background:linear-gradient(90deg,#5db0ff,#7ee787);color:#08111b;border:none}
+  .btn.primary:hover{text-decoration:none;filter:brightness(1.07)}
+  .btn.ghost{background:var(--bg2);color:var(--text)}
+  .btn.ghost:hover{text-decoration:none;border-color:var(--accent);color:#fff}
+
+  /* Sections */
+  section{padding:56px 0}
+  h2{font-size:28px;margin:0 0 8px}
+  h2 .dot{color:var(--accent)}
+  .section-sub{color:var(--muted);margin:0 0 32px;max-width:680px}
+
+  /* Journey */
+  .journey{display:grid;gap:14px}
+  .step{display:flex;gap:18px;align-items:flex-start;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+  .step .n{flex:0 0 40px;height:40px;width:40px;border-radius:10px;display:grid;place-items:center;
+    font-family:var(--mono);font-weight:700;color:#08111b;background:linear-gradient(135deg,#5db0ff,#7ee787)}
+  .step h3{margin:2px 0 4px;font-size:18px;color:#eef3f8}
+  .step p{margin:0;color:var(--muted);font-size:15px}
+
+  /* Cards */
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+  .card{display:block;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:22px 22px 20px;transition:border-color .15s,transform .15s}
+  .card:hover{text-decoration:none;border-color:var(--accent);transform:translateY(-2px)}
+  .card .tag{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--sec)}
+  .card.guide .tag{color:var(--accent2)}
+  .card h3{margin:8px 0 6px;font-size:18px;color:#eef3f8}
+  .card p{margin:0;color:var(--muted);font-size:14px}
+  .card .go{display:inline-block;margin-top:14px;font-size:13px;color:var(--accent);font-weight:600}
+
+  footer{border-top:1px solid var(--line);padding:36px 0 60px;color:var(--muted);font-size:14px;text-align:center}
+  footer a{color:var(--muted)}
+  footer a:hover{color:var(--text)}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">Homelab · a build-it-yourself course</div>
+    <h1>From an old PC to your own server</h1>
+    <p class="lead">Turn a spare machine into a real home server — your own private cloud. Learn the concepts from first principles, then build the whole stack step by step.</p>
+    <div class="btns">
+      <a class="btn primary" href="home-server-guide-v2.html">Start the full guide →</a>
+      <a class="btn ghost" href="#docs">Browse the docs</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section id="journey">
+    <h2>The journey<span class="dot">.</span></h2>
+    <p class="section-sub">Five stages, bottom to top. Each one is a section of the guide — and the concepts behind them live in the docs below.</p>
+    <div class="journey">
+      <div class="step"><div class="n">1</div><div>
+        <h3>Foundations</h3>
+        <p>The networking you must own: private vs public IPs, NAT, CGNAT, ports, DNS, and whether your connection can even host a server.</p>
+      </div></div>
+      <div class="step"><div class="n">2</div><div>
+        <h3>The hypervisor</h3>
+        <p>What virtualization actually is and how it works — then install Proxmox as the bare-metal base and run your OS as a VM inside it.</p>
+      </div></div>
+      <div class="step"><div class="n">3</div><div>
+        <h3>Build the base</h3>
+        <p>A Linux VM, SSH, a fixed internal IP, the daily commands, and Docker + Compose as the way you run everything.</p>
+      </div></div>
+      <div class="step"><div class="n">4</div><div>
+        <h3>Deploy your apps</h3>
+        <p>A reverse proxy, your domain on Cloudflare, DNS records, and getting to the internet safely — Cloudflare Tunnel or port forwarding.</p>
+      </div></div>
+      <div class="step"><div class="n">5</div><div>
+        <h3>Run it like a pro</h3>
+        <p>SSH keys, a firewall, fail2ban, backups and snapshots, and the maintenance habits that keep it alive and secure.</p>
+      </div></div>
+    </div>
+  </section>
+
+  <section id="docs">
+    <h2>The material<span class="dot">.</span></h2>
+    <p class="section-sub">The complete hands-on guide, plus deep-dive docs on virtualization from first principles.</p>
+    <div class="cards">
+      <a class="card guide" href="home-server-guide-v2.html">
+        <div class="tag">Complete guide</div>
+        <h3>The Home Server Guide</h3>
+        <p>The full walkthrough, start to finish — foundations, hypervisor, build, deploy, and hardening in one page.</p>
+        <span class="go">Read the guide →</span>
+      </a>
+      <a class="card" href="https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/hypervisors/01-what-is-a-hypervisor.md">
+        <div class="tag">Hypervisors · 01</div>
+        <h3>What is a hypervisor?</h3>
+        <p>Type 1 vs Type 2, why you'd virtualize, and how VMs differ from containers.</p>
+        <span class="go">Read doc →</span>
+      </a>
+      <a class="card" href="https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/hypervisors/02-how-virtualization-works.md">
+        <div class="tag">Hypervisors · 02</div>
+        <h3>How virtualization works</h3>
+        <p>VT-x/AMD-V, KVM, memory translation, virtio, and IOMMU/PCIe passthrough.</p>
+        <span class="go">Read doc →</span>
+      </a>
+      <a class="card" href="https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/hypervisors/03-choosing-a-platform.md">
+        <div class="tag">Hypervisors · 03</div>
+        <h3>Choosing a platform</h3>
+        <p>Proxmox vs ESXi vs XCP-ng vs KVM/libvirt — trade-offs and a decision guide.</p>
+        <span class="go">Read doc →</span>
+      </a>
+      <a class="card" href="https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/hypervisors/04-proxmox-in-practice.md">
+        <div class="tag">Hypervisors · 04</div>
+        <h3>Proxmox in practice</h3>
+        <p>VMs vs LXC, storage, networking, and snapshots vs backups on a real node.</p>
+        <span class="go">Read doc →</span>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    Built in the open · <a href="https://github.com/Olwethu-Dlamini/Homelab">github.com/Olwethu-Dlamini/Homelab</a><br>
+    Released into the public domain.
+  </div>
+</footer>
+
+</body>
+</html>
