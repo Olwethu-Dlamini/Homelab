@@ -16,8 +16,12 @@ delivered as a series of small, logically-scoped commits, each pushed to
 **In scope**
 - A root `README.md` that indexes the repository.
 - A `docs/hypervisors/` tree of four Markdown documents.
-- Cross-linking the existing `home-server-guide.html` to the new docs.
+- Cross-linking the current guide (`home-server-guide-v2.html`) to the new docs.
 - Reverting the noise-only line-ending change currently in `LICENSE`.
+
+> Note: the remote now has both `home-server-guide.html` (v1) and
+> `home-server-guide-v2.html` (v2, the current corrected guide). Cross-linking
+> targets v2.
 
 **Out of scope (YAGNI)**
 - Deploy scripts, cloud-init, or real config artifacts.
@@ -29,7 +33,7 @@ delivered as a series of small, logically-scoped commits, each pushed to
 ```
 README.md                     ← new: indexes the repo
 LICENSE                       ← revert line-ending noise
-home-server-guide.html        ← add links into docs/
+home-server-guide-v2.html     ← add links into docs/ (current guide)
 docs/
   hypervisors/
     01-what-is-a-hypervisor.md        Type 1 vs Type 2, why virtualize
@@ -62,7 +66,7 @@ repeated and learned.
 4. Add `02-how-virtualization-works.md`.
 5. Add `03-choosing-a-platform.md`.
 6. Add `04-proxmox-in-practice.md`.
-7. Cross-link `home-server-guide.html` to the new docs.
+7. Cross-link `home-server-guide-v2.html` to the new docs.
 
 For each commit, the exact `git` commands are shown and explained before running.
 
