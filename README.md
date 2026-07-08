@@ -3,6 +3,8 @@
 Notes and guides for turning an old PC into a capable home server — from
 networking fundamentals through running your own services.
 
+**🌐 Live site:** https://olwethu-dlamini.github.io/Homelab/
+
 ## Guides
 
 - **[Home Server Guide (v2)](home-server-guide-v2.html)** — the full walkthrough:
