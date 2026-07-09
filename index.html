@@ -7,7 +7,6 @@
 <meta name="description" content="A build-it-yourself homelab: turn an old PC into your own server. Hypervisors, VMs, Docker, networking, hardening.">
 <style>
   :root{
-    /* Tango-ish palette: authentic GNU/Linux terminal */
     --bg:#0a0a0a; --fg:#d6d6d6; --bright:#ffffff; --dim:#767676;
     --green:#8ae234; --blue:#8fb7e8; --sel:rgba(143,183,232,.30);
     --bar:#2c2c2c; --bar-fg:#c9c9c9; --edge:#000;
@@ -23,9 +22,8 @@
 
   .term{width:100%;max-width:840px;background:var(--bg);
     border:1px solid var(--edge);border-radius:6px;overflow:hidden;
-    box-shadow:0 18px 60px -22px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.03)}
-
-  /* GNOME-Terminal style title bar: centered title, NO window buttons */
+    box-shadow:0 18px 60px -22px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.03);
+    cursor:text}
   .titlebar{background:linear-gradient(#343434,#2a2a2a);color:var(--bar-fg);
     text-align:center;font-size:13px;padding:7px 12px;
     border-bottom:1px solid #1c1c1c;letter-spacing:.01em;user-select:none}
@@ -37,12 +35,12 @@
   .ps1{white-space:nowrap}
   .ps1 .u{color:var(--green);font-weight:600}
   .ps1 .p{color:var(--blue);font-weight:600}
-  .ps1 .d{color:var(--fg)}                       /* the $ */
+  .ps1 .d{color:var(--fg)}
   .cmd{color:var(--bright)}
   .prompt{margin:22px 0 3px}
   .prompt:first-of-type{margin-top:6px}
   .motd{color:var(--dim)}
-  .out{margin:3px 0}
+  .out{margin:3px 0;white-space:pre-wrap;word-break:break-word}
   .comment{color:var(--dim)}
   .bright{color:var(--bright)}
   a{color:inherit;text-decoration:none}
@@ -53,7 +51,6 @@
 
   .banner{color:var(--bright);font-size:12.5px;line-height:1.12;margin:2px 0}
 
-  /* aligned "ls" output: name column + description column */
   .listing{display:grid;grid-template-columns:max-content 1fr;
     column-gap:26px;row-gap:2px;margin:4px 0 2px}
   .listing .c{color:var(--dim)}
@@ -61,8 +58,16 @@
     column-gap:18px;row-gap:2px;margin:4px 0 2px}
   .roadmap .i{color:var(--dim)} .roadmap .k{color:var(--bright)} .roadmap .v{color:var(--fg)}
 
+  /* interactive prompt */
+  #cli{position:relative;margin-top:22px}
+  #cli .typed{color:var(--bright);white-space:pre-wrap;word-break:break-word}
+  #stdin{position:absolute;inset:0;width:100%;height:100%;
+    background:transparent;border:0;outline:none;padding:0;margin:0;
+    color:transparent;caret-color:transparent;font:inherit}
   .cursor{display:inline-block;width:8px;height:1.05em;background:var(--fg);
-    transform:translateY(2px);margin-left:2px;animation:blink 1.1s steps(1) infinite}
+    transform:translateY(2px);margin-left:1px;animation:blink 1.1s steps(1) infinite;
+    vertical-align:baseline}
+  #cli.typing .cursor{animation:none}          /* solid while typing */
   @keyframes blink{50%{opacity:0}}
   @media (prefers-reduced-motion:reduce){.cursor{animation:none}}
 
@@ -75,15 +80,15 @@
 </style>
 </head>
 <body>
-<div class="term">
+<div class="term" id="term">
   <div class="titlebar">oll@homelab: ~/homelab</div>
-  <div class="screen">
+  <div class="screen" id="screen">
 
 <div class="motd">Last login: Wed Jul  9 2026 on tty1</div>
-<div class="motd comment"># Welcome. Type along, or just read the output.</div>
+<div class="motd comment"># Welcome. This terminal actually works &mdash; type <span class="bright">help</span> and press enter. (it's for learning.)</div>
 
 <div class="prompt"><span class="ps1"><span class="u">oll@homelab</span>:<span class="p">~/homelab</span><span class="d">$</span></span> <span class="cmd">cat welcome</span></div>
-<div class="scroll"><pre class="banner"> _   _     ___     __  __    _____    _           _       ____
+<div class="scroll"><pre class="banner" id="welcome"> _   _     ___     __  __    _____    _           _       ____
 | | | |   / _ \   |  \/  |  | ____|  | |         / \     | __ )
 | |_| |  | | | |  | |\/| |  |  _|    | |        / _ \    |  _ \
 |  _  |  | |_| |  | |  | |  | |___   | |___    / ___ \   | |_) |
@@ -115,11 +120,171 @@
   <a class="file" href="https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/hypervisors/04-proxmox-in-practice.md">04-proxmox-in-practice.md</a><span class="c"># VMs vs LXC, storage, networking, backups</span>
 </div>
 
-<div class="prompt"><span class="ps1"><span class="u">oll@homelab</span>:<span class="p">~/homelab</span><span class="d">$</span></span> <span class="cmd"><a class="exe" href="home-server-guide-v2.html">./the-home-server-guide</a></span></div>
-<div class="out comment"># public domain &middot; source: <a class="file" href="https://github.com/Olwethu-Dlamini/Homelab" style="text-decoration:underline">github.com/Olwethu-Dlamini/Homelab</a></div>
-<div class="prompt"><span class="ps1"><span class="u">oll@homelab</span>:<span class="p">~/homelab</span><span class="d">$</span></span> <span class="cursor"></span></div>
+<!-- interactive prompt: type here -->
+<div class="prompt" id="cli">
+  <span class="ps1"><span class="u">oll@homelab</span>:<span class="p">~/homelab</span><span class="d">$</span></span>
+  <span class="typed" id="typed"></span><span class="cursor"></span>
+  <input id="stdin" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="terminal input">
+</div>
 
   </div>
 </div>
+
+<script>
+(function(){
+  var screen = document.getElementById('screen');
+  var cli    = document.getElementById('cli');
+  var typed  = document.getElementById('typed');
+  var stdin  = document.getElementById('stdin');
+  var term   = document.getElementById('term');
+  var hist = [], hix = 0;
+  var BANNER = document.getElementById('welcome').textContent;   // capture before any 'clear'
+
+  var DOCS = {
+    '1':'https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/hypervisors/01-what-is-a-hypervisor.md',
+    '2':'https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/hypervisors/02-how-virtualization-works.md',
+    '3':'https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/hypervisors/03-choosing-a-platform.md',
+    '4':'https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/hypervisors/04-proxmox-in-practice.md'
+  };
+
+  function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+  // add a node just before the interactive line
+  function add(cls, html){
+    var d = document.createElement('div');
+    d.className = cls;
+    d.innerHTML = html;
+    screen.insertBefore(d, cli);
+    return d;
+  }
+  function out(html){ add('out', html); }
+  function toBottom(){ window.scrollTo(0, document.body.scrollHeight); }
+
+  var PROMPT = '<span class="ps1"><span class="u">oll@homelab</span>:<span class="p">~/homelab</span><span class="d">$</span></span> ';
+  function echo(raw){ add('prompt', PROMPT + '<span class="cmd">' + esc(raw) + '</span>'); }
+
+  var HELP = [
+    'this is a <span class="bright">learning terminal</span>, not a real shell. commands that work:',
+    '  <span class="bright">help</span>            show this list',
+    '  <span class="bright">ls</span>              list what is here',
+    '  <span class="bright">ls docs</span>         list the hypervisor docs',
+    '  <span class="bright">cat roadmap</span>     the 5-stage build',
+    '  <span class="bright">cat welcome</span>     show the banner again',
+    '  <span class="bright">open guide</span>      open the full home-server guide',
+    '  <span class="bright">open 1..4</span>       open hypervisor doc N',
+    '  <span class="bright">whoami</span> / <span class="bright">pwd</span>     who &amp; where you are',
+    '  <span class="bright">neofetch</span>        system info',
+    '  <span class="bright">clear</span>           clear the screen'
+  ].join('\n');
+
+  var LS_HOME =
+    '<a class="exe" href="home-server-guide-v2.html">the-home-server-guide*</a>   the whole walkthrough\n' +
+    '<a class="dir" href="https://github.com/Olwethu-Dlamini/Homelab/tree/main/docs/hypervisors">docs/</a>                    deep-dive notes';
+
+  var LS_DOCS =
+    '<a class="file" href="'+DOCS['1']+'">01-what-is-a-hypervisor.md</a>\n' +
+    '<a class="file" href="'+DOCS['2']+'">02-how-virtualization-works.md</a>\n' +
+    '<a class="file" href="'+DOCS['3']+'">03-choosing-a-platform.md</a>\n' +
+    '<a class="file" href="'+DOCS['4']+'">04-proxmox-in-practice.md</a>';
+
+  var ROADMAP =
+    '<span class="comment"># bottom of the stack to the top</span>\n' +
+    '1  foundations        IPs, NAT, CGNAT, ports, DNS\n' +
+    '2  the hypervisor     virtualization + Proxmox as the base\n' +
+    '3  build the base     Linux VM, SSH, Docker + Compose\n' +
+    '4  deploy your apps   reverse proxy, domain, DNS, tunnels\n' +
+    '5  run it like a pro  SSH keys, firewall, backups, habits';
+
+  var NEOFETCH =
+    '   _______      <span class="green" style="color:var(--green)">oll@homelab</span>\n' +
+    '  |  ___  |     -----------\n' +
+    '  | |   | |     <span class="bright">OS</span>:     Homelab GNU/Linux\n' +
+    '  | |___| |     <span class="bright">Host</span>:   an old PC, reborn\n' +
+    '  |  ___  |     <span class="bright">Kernel</span>: learn-it-yourself\n' +
+    '  | |   | |     <span class="bright">Stack</span>:  Proxmox -&gt; VM -&gt; Docker\n' +
+    '  |_|   |_|     <span class="bright">Shell</span>:  this one (for learning)';
+
+  function openGuide(){
+    out('opening <span class="exe">./the-home-server-guide</span> ...');
+    toBottom();
+    setTimeout(function(){ window.location.href = 'home-server-guide-v2.html'; }, 450);
+  }
+
+  function run(raw){
+    echo(raw);
+    var cmd = raw.trim();
+    if(cmd){ hist.push(cmd); }
+    hix = hist.length;
+    if(!cmd){ toBottom(); return; }
+
+    var parts = cmd.split(/\s+/);
+    var c  = parts[0].toLowerCase();
+    var a1 = (parts[1]||'');
+
+    if(c==='help' || c==='?'){ out(HELP); }
+    else if(c==='ls' && a1.indexOf('docs')===0){ out(LS_DOCS); }
+    else if(c==='ls'){ out(LS_HOME); }
+    else if(c==='cat' && a1==='roadmap'){ out(ROADMAP); }
+    else if((c==='cat'||c==='less') && (a1==='welcome'||a1==='')){ printBanner(); }
+    else if(c==='clear'||c==='cls'){ clearScreen(); }
+    else if(c==='whoami'){ out('oll'); }
+    else if(c==='pwd'){ out('/home/oll/homelab'); }
+    else if(c==='date'){ out(new Date().toString()); }
+    else if(c==='neofetch'||c==='fetch'){ out(NEOFETCH); }
+    else if((c==='open'||c==='cat'||c==='xdg-open') && DOCS[a1]){ out('opening doc '+a1+' in a new tab ...'); window.open(DOCS[a1],'_blank'); }
+    else if(c==='guide' || (c==='open'&&a1==='guide') || cmd==='./the-home-server-guide'){ openGuide(); }
+    else if(c==='sudo'){ out("no root here — it's a learning terminal, not your box. :)"); }
+    else if(c==='rm'){ out("relax — nothing to break here. it's just for learning."); }
+    else if(c==='exit'||c==='logout'){ out("there's no escape from learning. (kidding — just close the tab.)"); }
+    else{
+      out(esc(parts[0]) + ': command not found');
+      out('<span class="comment"># this is a learning terminal, not a real shell — type <span class="bright">help</span> to see what works.</span>');
+    }
+    toBottom();
+  }
+
+  function printBanner(){
+    var wrap = document.createElement('div'); wrap.className='scroll';
+    var pre  = document.createElement('pre'); pre.className='banner';
+    pre.textContent = BANNER;
+    wrap.appendChild(pre);
+    screen.insertBefore(wrap, cli);
+    out('an old PC <span class="bright">-&gt;</span> your own server.');
+  }
+
+  function clearScreen(){
+    // remove everything before the interactive prompt
+    while(screen.firstChild && screen.firstChild !== cli){ screen.removeChild(screen.firstChild); }
+  }
+
+  function sync(){ typed.textContent = stdin.value; }
+
+  stdin.addEventListener('input', function(){ sync(); cli.classList.add('typing'); });
+  stdin.addEventListener('blur',  function(){ cli.classList.remove('typing'); });
+  stdin.addEventListener('keydown', function(e){
+    if(e.key==='Enter'){
+      e.preventDefault();
+      var v = stdin.value;
+      stdin.value=''; sync();
+      run(v);
+    } else if(e.key==='ArrowUp'){
+      e.preventDefault();
+      if(hix>0){ hix--; stdin.value=hist[hix]||''; sync(); setCaretEnd(); }
+    } else if(e.key==='ArrowDown'){
+      e.preventDefault();
+      if(hix<hist.length){ hix++; stdin.value=hist[hix]||''; sync(); setCaretEnd(); }
+    }
+  });
+  function setCaretEnd(){ try{ var n=stdin.value.length; stdin.setSelectionRange(n,n);}catch(_){}}
+
+  // clicking anywhere in the terminal focuses the input (so the caret/keyboard follow)
+  term.addEventListener('mousedown', function(e){
+    // let real links work
+    if(e.target.closest('a')) return;
+    setTimeout(function(){ stdin.focus(); }, 0);
+  });
+  window.addEventListener('load', function(){ stdin.focus(); });
+})();
+</script>
 </body>
 </html>
