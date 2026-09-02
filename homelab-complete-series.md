@@ -1,6 +1,3 @@
-# LinkedIn Series: From "What Is a Hypervisor?" to a Live Server in My House
-### 28 posts, one continuous story. Concepts first, then the real build with every mistake kept in.
-### Post 2-3 per week. Repo link goes in the comments, not the post body.
 
 ---
 
