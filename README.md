@@ -23,6 +23,12 @@ Vendor-neutral concepts first, then Proxmox VE as the concrete example.
 3. [Choosing a platform](docs/hypervisors/03-choosing-a-platform.md)
 4. [Proxmox in practice](docs/hypervisors/04-proxmox-in-practice.md)
 
+### Write-ups
+
+- **[Giving n8n a public doorbell](n8n-public-webhooks.md)** — making n8n's
+  webhooks reachable from the internet through srv1's Cloudflare Tunnel and
+  Caddy, while the editor stays on Tailscale. Mistakes included.
+
 ## License
 
 Released into the public domain — see [LICENSE](LICENSE).
