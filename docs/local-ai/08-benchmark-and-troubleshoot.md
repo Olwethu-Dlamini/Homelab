@@ -86,8 +86,15 @@ Run it when no workflow is due (it holds the only Ollama slot):
 python3 ~/bench.py qwen3.5:4b granite4.2:3b lfm3:1.7b
 ```
 
-`load s` on the cold row is the disk; `read/s` and `write/s` on the warm row
-are the numbers to record.
+`read/s` and `write/s` on the warm row are the numbers to record. `load s` on
+the cold row is the disk **only the first time a model loads after the VM
+boots**. After that, Linux usually still has the file in its page cache, and
+the "cold" load is much faster than the HDD. For a true disk number, empty the
+cache first (harmless, it just refills):
+
+```bash
+sync && echo 3 | sudo tee /proc/sys/vm/drop_caches >/dev/null
+```
 
 ## Results
 
