@@ -127,15 +127,17 @@ qm config 101 | grep balloon     # expect: balloon: 0
 ### The budget
 
 The host has 16GB: Proxmox itself (keep ~2GB free), srv1, and `ai` with 12GB.
-Inside `ai`, every container has a hard cap:
+Inside `ai`, every service has a hard cap (a Docker `mem_limit` for the
+containers, a systemd `MemoryMax` for mail-poll, which runs on a timer, not in
+Docker):
 
-| Container | Cap | Measured (Oct 2026) |
+| Service | Cap | Measured (Oct 2026) |
 |---|---|---|
 | Ollama | 6GB | 6.0GB peak with Mistral loaded; 13MB unloaded |
 | n8n | 1.5GB | 0.4 to 0.8GB |
 | Qdrant | 1.5GB | under 0.1GB, no collections yet |
 | WAHA | 768MB | ~350MB of its own |
-| bridge + mail-poll | 192MB | ~25MB |
+| bridge (container) + mail-poll (systemd) | 128MB + 64MB | ~25MB |
 | **Total caps** | **~10GB** | **1.2 to 1.8GB used with no model loaded** |
 
 There is room to raise Ollama's cap to **8GB** if you want a 9B model
