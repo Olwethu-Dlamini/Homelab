@@ -98,7 +98,7 @@
 <div class="prompt"><span class="ps1"><span class="u">oll@homelab</span>:<span class="p">~/homelab</span><span class="d">$</span></span> <span class="cmd">ls</span></div>
 <div class="listing">
   <a class="exe" href="home-server-guide-v2.html">the-home-server-guide*</a><span class="c"># the whole walkthrough, one page, start to finish</span>
-  <a class="dir" href="https://github.com/Olwethu-Dlamini/Homelab/tree/main/docs/hypervisors">docs/</a><span class="c"># deep-dive notes on virtualization</span>
+  <a class="dir" href="https://github.com/Olwethu-Dlamini/Homelab/tree/main/docs">docs/</a><span class="c"># deep-dive notes: virtualization, local AI</span>
 </div>
 
 <div class="prompt"><span class="ps1"><span class="u">oll@homelab</span>:<span class="p">~/homelab</span><span class="d">$</span></span> <span class="cmd">cat roadmap</span></div>
@@ -118,6 +118,19 @@
   <a class="file" href="https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/hypervisors/02-how-virtualization-works.md">02-how-virtualization-works.md</a><span class="c"># VT-x/AMD-V, KVM, virtio, IOMMU/passthrough</span>
   <a class="file" href="https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/hypervisors/03-choosing-a-platform.md">03-choosing-a-platform.md</a><span class="c"># Proxmox vs ESXi vs XCP-ng vs KVM/libvirt</span>
   <a class="file" href="https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/hypervisors/04-proxmox-in-practice.md">04-proxmox-in-practice.md</a><span class="c"># VMs vs LXC, storage, networking, backups</span>
+</div>
+
+<div class="prompt"><span class="ps1"><span class="u">oll@homelab</span>:<span class="p">~/homelab</span><span class="d">$</span></span> <span class="cmd">ls docs/local-ai/</span></div>
+<div class="out comment"># language models on the CPU, no GPU &mdash; read in order:</div>
+<div class="listing">
+  <a class="file" href="https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/local-ai/01-can-a-cpu-run-ai.md">01-can-a-cpu-run-ai.md</a><span class="c"># memory bandwidth, measured speeds, good jobs</span>
+  <a class="file" href="https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/local-ai/02-sizing-a-model.md">02-sizing-a-model.md</a><span class="c"># quantization, context, MoE, will it fit?</span>
+  <a class="file" href="https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/local-ai/03-the-ai-vm-in-proxmox.md">03-the-ai-vm-in-proxmox.md</a><span class="c"># CPU type + AVX2, cores, memory, the slow disk</span>
+  <a class="file" href="https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/local-ai/04-the-best-models.md">04-the-best-models.md</a><span class="c"># what to run, Nov 2026</span>
+  <a class="file" href="https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/local-ai/05-ollama-on-the-stack.md">05-ollama-on-the-stack.md</a><span class="c"># settings, switching models, thinking, API</span>
+  <a class="file" href="https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/local-ai/06-chat-ui-open-webui.md">06-chat-ui-open-webui.md</a><span class="c"># a private chat page over Tailscale</span>
+  <a class="file" href="https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/local-ai/07-n8n-and-rag.md">07-n8n-and-rag.md</a><span class="c"># local models in n8n, RAG with Qdrant</span>
+  <a class="file" href="https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/local-ai/08-benchmark-and-troubleshoot.md">08-benchmark-and-troubleshoot.md</a><span class="c"># measure tokens/s, fix the usual failures</span>
 </div>
 
 <!-- interactive prompt: type here -->
@@ -147,6 +160,18 @@
     '4':'https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/hypervisors/04-proxmox-in-practice.md'
   };
 
+  var AI = 'https://github.com/Olwethu-Dlamini/Homelab/blob/main/docs/local-ai/';
+  var AI_DOCS = {
+    'ai1':AI+'01-can-a-cpu-run-ai.md',
+    'ai2':AI+'02-sizing-a-model.md',
+    'ai3':AI+'03-the-ai-vm-in-proxmox.md',
+    'ai4':AI+'04-the-best-models.md',
+    'ai5':AI+'05-ollama-on-the-stack.md',
+    'ai6':AI+'06-chat-ui-open-webui.md',
+    'ai7':AI+'07-n8n-and-rag.md',
+    'ai8':AI+'08-benchmark-and-troubleshoot.md'
+  };
+
   function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
   // add a node just before the interactive line
@@ -168,10 +193,12 @@
     '  <span class="bright">help</span>            show this list',
     '  <span class="bright">ls</span>              list what is here',
     '  <span class="bright">ls docs</span>         list the hypervisor docs',
+    '  <span class="bright">ls ai</span>           list the local AI docs',
     '  <span class="bright">cat roadmap</span>     the 5-stage build',
     '  <span class="bright">cat welcome</span>     show the banner again',
     '  <span class="bright">open guide</span>      open the full home-server guide',
     '  <span class="bright">open 1..4</span>       open hypervisor doc N',
+    '  <span class="bright">open ai1..ai8</span>   open local AI doc N',
     '  <span class="bright">whoami</span> / <span class="bright">pwd</span>     who &amp; where you are',
     '  <span class="bright">neofetch</span>        system info',
     '  <span class="bright">clear</span>           clear the screen'
@@ -179,13 +206,18 @@
 
   var LS_HOME =
     '<a class="exe" href="home-server-guide-v2.html">the-home-server-guide*</a>   the whole walkthrough\n' +
-    '<a class="dir" href="https://github.com/Olwethu-Dlamini/Homelab/tree/main/docs/hypervisors">docs/</a>                    deep-dive notes';
+    '<a class="dir" href="https://github.com/Olwethu-Dlamini/Homelab/tree/main/docs">docs/</a>                    deep-dive notes';
 
   var LS_DOCS =
     '<a class="file" href="'+DOCS['1']+'">01-what-is-a-hypervisor.md</a>\n' +
     '<a class="file" href="'+DOCS['2']+'">02-how-virtualization-works.md</a>\n' +
     '<a class="file" href="'+DOCS['3']+'">03-choosing-a-platform.md</a>\n' +
     '<a class="file" href="'+DOCS['4']+'">04-proxmox-in-practice.md</a>';
+
+  var LS_AI = Object.keys(AI_DOCS).map(function(k){
+    var f = AI_DOCS[k].slice(AI.length);
+    return '<a class="file" href="'+AI_DOCS[k]+'">'+f+'</a>   <span class="comment">open '+k+'</span>';
+  }).join('\n');
 
   var ROADMAP =
     '<span class="comment"># bottom of the stack to the top</span>\n' +
@@ -222,6 +254,7 @@
     var a1 = (parts[1]||'');
 
     if(c==='help' || c==='?'){ out(HELP); }
+    else if(c==='ls' && (a1==='ai' || a1.indexOf('docs/local-ai')===0)){ out(LS_AI); }
     else if(c==='ls' && a1.indexOf('docs')===0){ out(LS_DOCS); }
     else if(c==='ls'){ out(LS_HOME); }
     else if(c==='cat' && a1==='roadmap'){ out(ROADMAP); }
@@ -232,6 +265,7 @@
     else if(c==='date'){ out(new Date().toString()); }
     else if(c==='neofetch'||c==='fetch'){ out(NEOFETCH); }
     else if((c==='open'||c==='cat'||c==='xdg-open') && DOCS[a1]){ out('opening doc '+a1+' in a new tab ...'); window.open(DOCS[a1],'_blank'); }
+    else if((c==='open'||c==='cat'||c==='xdg-open') && AI_DOCS[a1.toLowerCase()]){ out('opening local AI doc '+esc(a1)+' in a new tab ...'); window.open(AI_DOCS[a1.toLowerCase()],'_blank'); }
     else if(c==='guide' || (c==='open'&&a1==='guide') || cmd==='./the-home-server-guide'){ openGuide(); }
     else if(c==='sudo'){ out("no root here — it's a learning terminal, not your box. :)"); }
     else if(c==='rm'){ out("relax — nothing to break here. it's just for learning."); }
