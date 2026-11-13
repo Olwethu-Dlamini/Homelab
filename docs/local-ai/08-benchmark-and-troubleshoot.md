@@ -124,6 +124,7 @@ The load right after it, with part of the file still cached, took 40.9s.
 | Writing under ~2 tok/s on a 4B model | VM lacks AVX2 | `grep -o -w avx2 /proc/cpuinfo` inside `ai`; CPU type `host` ([ch. 3](03-the-ai-vm-in-proxmox.md#1-cpu-type-does-the-vm-see-avx2)) |
 | Slow, and `ollama ps` shows the right model | Ollama capped at 3 CPUs; swap in use; another request ahead in the queue | `OLLAMA_CPUS` in `.env`; `free -m`; `sudo docker logs ollama --since 10m` |
 | Long pause before any answer, then normal speed | Model loading from the HDD, or a long thinking phase | `load_duration` in the API response; `"think": false` ([ch. 5](05-ollama-on-the-stack.md#thinking-on-or-off)) |
+| Cold load of minutes for a few GB (well under the HDD's ~90MB/s) | Ollama's parallel readers make the HDD seek; or another VM on the disk; or a failing disk | `GOMAXPROCS=1` for Ollama first ([ch. 3](03-the-ai-vm-in-proxmox.md#4-the-disk-why-the-first-answer-is-slow)), then `iostat -x 2` and `smartctl -a` on `pve` |
 | Model fails to load, error mentions memory | Model + context bigger than `OLLAMA_MEM` | A smaller model, a smaller context, or `OLLAMA_MEM=8g` ([ch. 2](02-sizing-a-model.md#checklist-will-it-fit)) |
 | Ollama container restarts during a request | Killed at its memory cap | `sudo docker inspect ollama --format '{{.State.OOMKilled}}'` → `true` means the same fix as above |
 | `pull` fails asking for a newer Ollama | New model, old image | `sudo bash deploy.sh` pulls the latest `ollama/ollama` image |
