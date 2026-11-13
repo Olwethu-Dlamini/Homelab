@@ -167,6 +167,19 @@ host's single 500GB HDD. Loading Mistral took **48.1s** from cold, about
   10 minutes pays the load every time. [Chapter 5](05-ollama-on-the-stack.md)
   covers the trade-off.
 
+**13 November 2026: the same load took 213.3s**, about 20MB/s, four times
+slower than in October. Writing speed was unchanged (3.1 tok/s), so the CPU
+and RAM are fine and the disk is not. The cause isn't known yet. The two
+likely ones, and how to tell them apart:
+
+- **Something else using the HDD at the same time** (the other VM, a backup,
+  a scrub). Watch the host while a model loads: `iostat -x 2` on `pve` shows
+  the disk near 100% busy, and which VM is reading.
+- **The disk is failing.** A dying HDD retries slow sectors, and reads crawl.
+  `smartctl -a /dev/sdX` on `pve`: non-zero `Reallocated_Sector_Ct`,
+  `Current_Pending_Sector` or `Offline_Uncorrectable` mean replace it soon,
+  and back up first.
+
 An SSD remains the single best hardware upgrade for this box: it would cut cold
 loads to a few seconds and help every VM.
 
