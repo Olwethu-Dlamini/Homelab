@@ -21,6 +21,8 @@ ollama:
     - OLLAMA_KEEP_ALIVE=${OLLAMA_KEEP_ALIVE:-2m}
     - OLLAMA_MAX_LOADED_MODELS=1
     - OLLAMA_NUM_PARALLEL=1
+    # Since 13 Nov 2026: stops parallel model reads thrashing the HDD (chapter 3).
+    - GOMAXPROCS=${OLLAMA_GOMAXPROCS-1}
   cpus: ${OLLAMA_CPUS:-3}
   mem_limit: ${OLLAMA_MEM:-6g}
 ```
