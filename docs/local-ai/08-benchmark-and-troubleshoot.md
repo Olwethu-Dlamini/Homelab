@@ -106,6 +106,7 @@ type and cores, or a new model), so you know what actually helped.
 | 2026-10-07 | mistral (7B Q4_K_M) | ? | 3 | 48.1s | ~16 | ~3 |
 | 2026-11-13 | mistral (7B Q4_K_M) | host (AVX2 seen) | ? | **213.3s**; 40.9s on the next load | ~17 | 3.1 |
 | 2026-11-13 (later) | mistral (7B Q4_K_M), `GOMAXPROCS=1`, Ollama 0.40.16 | host (AVX2 seen) | ? | **63.5s**, page cache emptied first | ~18 | 3.1 |
+| 2026-11-13 (bench.py) | mistral (7B Q4_K_M), `GOMAXPROCS=1`, Ollama 0.40.16 | host (AVX2 seen) | ? | 52.5s, part of the file still cached | **18.8** | **2.8** |
 | | qwen3.5:4b | | | | | |
 | | granite4.2:3b | | | | | |
 | | lfm3:1.7b | | | | | |
@@ -121,6 +122,12 @@ The "later" row is the same request after redeploying with `GOMAXPROCS=1` and
 emptying the page cache: the cold load fell from 213.3s to 63.5s (about 70MB/s)
 and writing speed stayed at 3.1 tok/s. The redeploy also upgraded Ollama from
 0.40.7 to 0.40.16, so part of the gain may come from that.
+The "bench.py" row is the comparable run from this page (570 prompt tokens,
+about 110 answer tokens), the first real numbers for the table: warm, Mistral
+reads at 18.8 tok/s and writes at 2.8 tok/s, so a request like this takes
+about 70s once loaded. Its cold load of 52.5s came about 15 minutes after the
+previous run with ~1.9GB still in the page cache, so it is not a disk number;
+63.5s above is.
 
 ## Troubleshooting
 
