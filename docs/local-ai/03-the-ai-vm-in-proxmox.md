@@ -179,10 +179,13 @@ ones, cheapest to check first:
   with a 5,700 RPM HDD saw loads crawl, and an Ollama maintainer suggested
   `GOMAXPROCS=1` in the server's environment; loads "improved a lot for some
   models" (Qwen3-8B down to about 1.5 minutes), not all. The DDOService stack
-  sets it since 13 November (`OLLAMA_GOMAXPROCS=1` in `.env`, empty to undo);
-  it takes effect at the next `sudo bash deploy.sh`. Measure a cold load before
-  and after, with the page cache emptied as in
-  [chapter 8](08-benchmark-and-troubleshoot.md#measuring-the-comparable-way).
+  sets it since 13 November (`OLLAMA_GOMAXPROCS=1` in `.env`, empty to undo).
+  **Result the same day:** a cold Mistral load, page cache emptied first, took
+  **63.5s instead of 213.3s**, with writing unchanged at 3.1 tok/s
+  ([chapter 8](08-benchmark-and-troubleshoot.md#results)). The same redeploy
+  upgraded Ollama (0.40.7 to 0.40.16), so not all of it is proven to be
+  `GOMAXPROCS`. Still slower than October's 48.1s, so the other two causes are
+  worth a look.
 
 - **Something else using the HDD at the same time** (the other VM, a backup,
   a scrub). Watch the host while a model loads: `iostat -x 2` on `pve` shows

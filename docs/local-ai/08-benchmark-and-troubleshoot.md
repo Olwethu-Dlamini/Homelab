@@ -105,6 +105,7 @@ type and cores, or a new model), so you know what actually helped.
 |---|---|---|---|---|---|---|
 | 2026-10-07 | mistral (7B Q4_K_M) | ? | 3 | 48.1s | ~16 | ~3 |
 | 2026-11-13 | mistral (7B Q4_K_M) | host (AVX2 seen) | ? | **213.3s**; 40.9s on the next load | ~17 | 3.1 |
+| 2026-11-13 (later) | mistral (7B Q4_K_M), `GOMAXPROCS=1`, Ollama 0.40.16 | host (AVX2 seen) | ? | **63.5s**, page cache emptied first | ~18 | 3.1 |
 | | qwen3.5:4b | | | | | |
 | | granite4.2:3b | | | | | |
 | | lfm3:1.7b | | | | | |
@@ -116,6 +117,10 @@ prompt, so its reading speed is rough. The 13 November row is one API request
 load took four times October's, see
 [chapter 3](03-the-ai-vm-in-proxmox.md#4-the-disk-why-the-first-answer-is-slow).
 The load right after it, with part of the file still cached, took 40.9s.
+The "later" row is the same request after redeploying with `GOMAXPROCS=1` and
+emptying the page cache: the cold load fell from 213.3s to 63.5s (about 70MB/s)
+and writing speed stayed at 3.1 tok/s. The redeploy also upgraded Ollama from
+0.40.7 to 0.40.16, so part of the gain may come from that.
 
 ## Troubleshooting
 
