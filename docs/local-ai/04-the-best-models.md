@@ -26,7 +26,8 @@ Speeds are estimates scaled from the measured Mistral run
 the CPU-type fix in chapter 3 lands, all of them rise. Measure your own with
 [chapter 8](08-benchmark-and-troubleshoot.md).
 
-For comparison, Mistral 7B: 4.4GB, **3 tok/s measured**.
+For comparison, Mistral 7B: 4.4GB, **3 tok/s measured**. For models under
+1.5GB, see [Smaller still](#smaller-still-under-15gb).
 
 ## The picks, one by one
 
@@ -100,6 +101,44 @@ For comparison, Mistral 7B: 4.4GB, **3 tok/s measured**.
 | LFM2.5 8B-A1B | `lfm2.5:8b` | 5.2GB | MoE with ~1B active: 8B-class memory, near-1B speed | Fills the 6GB cap; scores mostly lab-reported |
 | Bonsai 2 9B | `bonsai-2:9b` | 3.2GB | **Ternary** weights: a 9B model in the space of a 4B, Apache 2.0, vision and tools | CPU speed of its 2-bit kernels unknown here; benchmark it first |
 
+## Smaller still: under 1.5GB
+
+For jobs where a fast answer matters more than a smart one, there are models
+far smaller than LFM3. Two independent CPU tests from October 2026 measured
+them. The pattern in both: **below about 2B, speed and correctness split**. The
+tiny ones write fast, pass simple extraction and labelling, and get arithmetic,
+dates and multi-step questions wrong with full confidence.
+
+| Model | Tag | File (Q4) | Writes | Sanity check | Good for |
+|---|---|---|---|---|---|
+| Qwen3.5 0.8B | `qwen3.5:0.8b` | 0.53GB | 18.9 tok/s | 12/20 | The fastest real option: yes/no, one-word labels, short replies |
+| Llama 3.2 1B | `llama3.2:1b` | 0.74GB (the default tag is Q8, ~1.3GB) | 15.9 tok/s | 14/20 | Simple extraction and classification |
+| Qwen3.5 2B | `qwen3.5:2b` | 1.29GB | 9.1 tok/s | 14/20 | JSON for n8n: 19 of 20 support emails became schema-valid tickets |
+| Gemma 3 1B | `gemma3:1b` | 0.8GB | 26 to 28 tok/s* | wrong on the reasoning question 3 of 3* | Skip: fast and confidently wrong |
+| Qwen3 0.6B | `qwen3:0.6b` | 0.52GB | 32 to 36 tok/s* | wrong on the reasoning question 3 of 3* | Raw speed only |
+| SmolLM2 360M | `smollm2:360m` | 0.73GB (F16) | 13 to 14 tok/s* | the only clean, correct JSON in its test* | Plain JSON extraction |
+| Gemma 3 270M | `gemma3:270m` | ~0.3GB | not measured | not measured | Mostly a base for fine-tuning |
+
+Speeds without a star are from a 2-core i5-7200U laptop with llama.cpp at Q4
+(10 models, a 20-question sanity check). Starred ones are from an older Xeon
+without AVX2 (5 models, 4 prompts, 3 runs each). `ai` has 4 cores of an i5-8500
+with AVX2, so expect similar or slightly faster, and measure with
+[chapter 8](08-benchmark-and-troubleshoot.md) before trusting any of them.
+
+What the tests found, in short:
+
+- Even the 0.8B passed simple extraction (an email address, `{"name","age"}`
+  from a sentence), sentiment and a one-line bug fix.
+- The models under 2.5B got only 9 of 24 tries at date and arithmetic
+  questions right ("Monday + 10 days", "3 boxes of 12, give away 9").
+- On a harder job, 20 support emails into schema-valid JSON tickets, Llama 3.2
+  1B got 8 of 20 fully right; Qwen3.5 2B and 4B got 19.
+- From the HDD, a 0.5GB model loads in seconds instead of Mistral's minutes,
+  and it is small enough to keep loaded all the time.
+
+For this stack: `qwen3.5:2b` is the small model for n8n jobs that must return
+JSON; `qwen3.5:0.8b` only for the simplest labels, where its speed pays off.
+
 ## Considered and skipped
 
 | Model | Why not, on this box |
@@ -141,3 +180,6 @@ Models you stop using still take disk space: `ollama rm <tag>`.
 - Scores and memory estimates: [Tiny Analysis small-model leaderboard](https://tinyanalysis.com/),
   [best LLMs for an 8GB machine](https://tinyanalysis.com/best/8gb-gpu)
 - Independent measurements: [Artificial Analysis](https://artificialanalysis.ai/)
+- Small models on a CPU, measured: [AI Tool Labs, 10 models on a 2-core laptop](https://aitoollabs.dev/posts/best-small-llm-for-cpu/)
+  (October 2026), [llmbits, 5 tiny models on an old Xeon](https://www.llmbits.com/tiny-ollama-models-cpu-shootout)
+  (October 2026)
