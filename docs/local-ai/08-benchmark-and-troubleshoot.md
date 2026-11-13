@@ -104,13 +104,18 @@ type and cores, or a new model), so you know what actually helped.
 | Date | Model | CPU type | `OLLAMA_CPUS` | Cold load | Read tok/s | Write tok/s |
 |---|---|---|---|---|---|---|
 | 2026-10-07 | mistral (7B Q4_K_M) | ? | 3 | 48.1s | ~16 | ~3 |
+| 2026-11-13 | mistral (7B Q4_K_M) | host (AVX2 seen) | ? | **213.3s**; 40.9s on the next load | ~17 | 3.1 |
 | | qwen3.5:4b | | | | | |
 | | granite4.2:3b | | | | | |
 | | lfm3:1.7b | | | | | |
 | | qwen3.5:9b (8GB cap) | | | | | |
 
-The Mistral row is from the stack's design notes, measured with one short
-prompt, so its reading speed is rough.
+The 7 October row is from the stack's design notes, measured with one short
+prompt, so its reading speed is rough. The 13 November row is one API request
+(16 prompt tokens, 27 answer tokens) after the VM had been up 43 days: the cold
+load took four times October's, see
+[chapter 3](03-the-ai-vm-in-proxmox.md#4-the-disk-why-the-first-answer-is-slow).
+The load right after it, with part of the file still cached, took 40.9s.
 
 ## Troubleshooting
 
