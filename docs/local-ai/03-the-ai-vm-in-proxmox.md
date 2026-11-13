@@ -169,8 +169,20 @@ host's single 500GB HDD. Loading Mistral took **48.1s** from cold, about
 
 **13 November 2026: the same load took 213.3s**, about 20MB/s, four times
 slower than in October. Writing speed was unchanged (3.1 tok/s), so the CPU
-and RAM are fine and the disk is not. The cause isn't known yet. The two
-likely ones, and how to tell them apart:
+and RAM are fine and the disk is not. The cause isn't known yet. Three likely
+ones, cheapest to check first:
+
+- **Ollama fighting itself for the disk.** Ollama loads a model with several
+  readers in parallel. On an SSD that's faster; on a spinning disk the head
+  seeks between them instead of reading. In
+  [ollama/ollama#14164](https://github.com/ollama/ollama/issues/14164) a user
+  with a 5,700 RPM HDD saw loads crawl, and an Ollama maintainer suggested
+  `GOMAXPROCS=1` in the server's environment; loads "improved a lot for some
+  models" (Qwen3-8B down to about 1.5 minutes), not all. The DDOService stack
+  sets it since 13 November (`OLLAMA_GOMAXPROCS=1` in `.env`, empty to undo);
+  it takes effect at the next `sudo bash deploy.sh`. Measure a cold load before
+  and after, with the page cache emptied as in
+  [chapter 8](08-benchmark-and-troubleshoot.md#measuring-the-comparable-way).
 
 - **Something else using the HDD at the same time** (the other VM, a backup,
   a scrub). Watch the host while a model loads: `iostat -x 2` on `pve` shows
@@ -179,6 +191,16 @@ likely ones, and how to tell them apart:
   `smartctl -a /dev/sdX` on `pve`: non-zero `Reallocated_Sector_Ct`,
   `Current_Pending_Sector` or `Offline_Uncorrectable` mean replace it soon,
   and back up first.
+
+What others with this stack do (GitHub, November 2026): n8n's official
+[self-hosted AI starter kit](https://github.com/n8n-io/self-hosted-ai-starter-kit)
+(15k stars) pulls `llama3.2`, a 3B model, by default, with a separate `cpu`
+profile; [selfhost-ai](https://github.com/kossakovsky/selfhost-ai) keeps two
+models loaded and uses a q8_0 KV cache; a
+[WAHA + n8n + Ollama WhatsApp bot](https://github.com/Fisc0-oS/Whatsapp-AI-bot)
+runs `gemma2:2b`, routes intents with rules before the model, keeps only the
+last 6 chat turns, and quotes 15 to 30s per answer on a CPU. Nobody runs a 7B
+on a CPU for n8n jobs.
 
 An SSD remains the single best hardware upgrade for this box: it would cut cold
 loads to a few seconds and help every VM.
