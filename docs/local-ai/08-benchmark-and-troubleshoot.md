@@ -129,6 +129,15 @@ about 70s once loaded. Its cold load of 52.5s came about 15 minutes after the
 previous run with ~1.9GB still in the page cache, so it is not a disk number;
 63.5s above is.
 
+**n8n research agent (2026-11-14).** One question to the `Local research agent
+(Ollama + SearXNG)` workflow (Chat Trigger, AI Agent, Ollama Chat Model with
+`mistral`, SearXNG tool), sent to its chat webhook: "What is the latest stable
+Proxmox VE version? Search the web." It took **201.5s** end to end, with Mistral
+not loaded beforehand, so a cold load is included. The answer was 9.2, released
+21 May 2026, with the proxmox.com download link: a fact newer than Mistral's
+training, so it came from the search. The run has no per-node breakdown
+because this n8n does not save successful production runs.
+
 ## Troubleshooting
 
 | Symptom | Likely cause | Check / fix |
