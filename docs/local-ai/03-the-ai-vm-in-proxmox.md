@@ -206,7 +206,8 @@ last 6 chat turns, and quotes 15 to 30s per answer on a CPU. Nobody runs a 7B
 on a CPU for n8n jobs.
 
 An SSD remains the single best hardware upgrade for this box: it would cut cold
-loads to a few seconds and help every VM.
+loads to a few seconds and help every VM. The host has an empty M.2 NVMe slot;
+[chapter 9](09-m2-ssd-upgrade.md) covers the drive, the speeds and the move.
 
 ## 5. Things that don't help here
 

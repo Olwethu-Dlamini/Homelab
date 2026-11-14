@@ -32,6 +32,9 @@ Read in order:
 8. **[Benchmarking and troubleshooting](08-benchmark-and-troubleshoot.md)**
    Measuring tokens per second, a results table to fill in, and the usual
    failures.
+9. **[An M.2 SSD for the host](09-m2-ssd-upgrade.md)**
+   The empty M.2 slot in the ProDesk, what an NVMe drive would do to load
+   times (and what it wouldn't), which drive, and moving `ai` onto it.
 
 The [hypervisor docs](../hypervisors/) explain the Proxmox ideas these pages
 lean on (VM vs LXC, VirtIO, CPU type `host`).
